@@ -9,8 +9,13 @@ repositories {
     mavenCentral()
 }
 
+val kotestVersion = "5.9.0"
 dependencies {
+    implementation(kotlin("stdlib"))
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
     testImplementation(kotlin("test"))
+    testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
+    testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
 }
 
 tasks.test {

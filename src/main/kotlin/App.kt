@@ -1,3 +1,12 @@
-fun main() {
-    println("Hello, World!")
+
+class App {
+    fun greet() : String {
+        return "Hello, World!"
+    }
 }
+
+fun main() {
+    val app = App()
+    app.greet()
+}
+
