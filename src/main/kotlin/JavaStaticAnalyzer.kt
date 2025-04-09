@@ -1,3 +1,6 @@
+import java.io.File
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.util.concurrent.ConcurrentHashMap
 
 class JavaStaticAnalyzer(
@@ -21,15 +24,18 @@ class JavaStaticAnalyzer(
     }
 
     fun collectAllClasses() {
-        // Placeholder for collecting all classes
-        // source dirs for each
-            // dir
-        //if file exists
-            // walk
-            // filter out .java or .class files
-        // for each file
-        // when file is a class -> processClassFile(file)
-        // when file is a java file -> processJavaFile(file)
+        sourceDirs.map{ File(it)}.forEach { directory ->
+            if (directory.isFile) {
+                directory.walkTopDown()
+                    .filter { it.extension == "java" || it.extension == "class" }
+                    .forEach { file ->
+                        when (file.extension) {
+                            "java" -> processJavaFile(file.absolutePath)
+                            "class" -> processClassFile(file.absolutePath)
+                        }
+                    }
+            }
+        }
     }
 
     fun processClassFile(file: String) {
