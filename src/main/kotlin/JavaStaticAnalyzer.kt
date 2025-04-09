@@ -8,6 +8,12 @@ class JavaStaticAnalyzer(
     private val classpath: List<String>,
     private val excludePatterns: List<Regex> = emptyList(),
 ) {
+    val packagePattern = Regex("package\\s+([a-zA-Z0-9_.]+)")
+    val classPattern = Regex("(public|private|protected)?\\s*(class|interface|enum)\\s+([a-zA-Z0-9_]+)")
+    val importPattern = Regex("import\\s+([a-zA-Z0-9_.]+)(\\s*;|\\.\\*\\s*;)")
+    val referencePattern = Regex("\\b([A-Z][a-zA-Z0-9_]*)\\b")
+    val annotationPattern = Regex("@([A-Z][a-zA-Z0-9_]*)")
+
     private val allClasses = ConcurrentHashMap.newKeySet<String>()
     private val referenceClasses = ConcurrentHashMap.newKeySet<String>()
     private val entryPoints = setOf(
@@ -19,8 +25,9 @@ class JavaStaticAnalyzer(
     )
 
     fun analyze(): Set<String> {
-        // Placeholder for static analysis logic
-        return emptySet()
+        collectAllClasses()
+        findReferences()
+        return computeUnusedClasses()
     }
 
     fun collectAllClasses() {
@@ -72,9 +79,9 @@ class JavaStaticAnalyzer(
     }
 
     fun computeUnusedClasses() : Set<String> {
-        // Placeholder for computing unused classes
-        // return allClasses - referenceClasses
-        return emptySet()
+        return allClasses.filter { className -> //todo do I want a size print statement?
+            !referenceClasses.contains(className) && !isEntryPoint(className)
+        }.toSet()
     }
 }
 
@@ -102,4 +109,16 @@ class SpecialCaseHandler {
         // }.toSet()
         return emptySet()
     }
+}
+
+fun main() {
+    val sourceDirs = listOf("src/test/resources/interview-homework-input")
+    val classpath = listOf("lib/some-library.jar")
+    val analyzer = JavaStaticAnalyzer(
+        sourceDirs = sourceDirs,
+        classpath = classpath
+    )
+    analyzer.collectAllClasses()
+    val unusedClasses = analyzer.analyze()
+    unusedClasses.sorted().forEach { println(it) }
 }
