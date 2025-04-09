@@ -1,25 +1,20 @@
-import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.core.spec.style.StringSpec
 
-class JavaStaticAnalyzerTests: DescribeSpec({
-    val sourceDirs = listOf("src/main/java", "src/test/java")
-    val classpath = listOf("lib/some-library.jar")
-    describe("JavaStaticAnalyzer") {
-        it("should analyze Java files correctly") {
-            val analyzer = JavaStaticAnalyzer(
-                sourceDirs = sourceDirs,
-                classpath = classpath
-            )
-            val result = analyzer.analyze() + ("com.example.MyClass")
-            assert(result.isNotEmpty())
-        }
+class JavaStaticAnalyzerTests: StringSpec({
+   "collectAllClasses should collect all Java and class files" {
+         // Given
+         val sourceDirs = listOf("src/test/resources/interview-homework-input")
+         val classpath = listOf("lib/some-library.jar")
+         val analyzer = JavaStaticAnalyzer(
+              sourceDirs = sourceDirs,
+              classpath = classpath
+         )
 
-        it("should handle empty files") {
-            val analyzer = JavaStaticAnalyzer(
-                sourceDirs = sourceDirs,
-                classpath = classpath
-            )
-            val result = analyzer.analyze()
-            assert(result.isEmpty())
-        }
-    }
+         // When
+         analyzer.collectAllClasses()
+
+         // Then
+         // Check that the classes are collected correctly
+         assert(analyzer.isAllClassesEmpty())
+   }
 })

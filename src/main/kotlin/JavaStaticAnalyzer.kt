@@ -1,8 +1,6 @@
-import com.sun.org.apache.bcel.internal.classfile.ClassParser
 import java.io.File
-import java.nio.file.Files
-import java.nio.file.Paths
 import java.util.concurrent.ConcurrentHashMap
+import org.apache.bcel.classfile.ClassParser
 
 class JavaStaticAnalyzer(
     private val sourceDirs: List<String>,
@@ -102,6 +100,9 @@ class JavaStaticAnalyzer(
         // Placeholder for finding references in class files
         // check if class is a reference class
         // check if class is an entry point
+    }
+    fun isAllClassesEmpty(): Boolean {
+        return allClasses.isEmpty()
     }
 
     fun isEntryPoint(className: String): Boolean {

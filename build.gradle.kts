@@ -23,6 +23,7 @@ dependencies {
     implementation ("org.apache.maven.shared:maven-dependency-analyzer:1.15.1")
     implementation ("org.apache.maven:maven-project:2.2.1")
     implementation ("org.apache.maven:maven-core:3.9.6")
+    implementation ("org.apache.bcel:bcel:6.6.1")
     implementation ("org.eclipse.aether:aether-api:1.1.0")
     implementation ("org.eclipse.aether:aether-impl:1.1.0")
     implementation ("org.eclipse.aether:aether-connector-basic:1.1.0")
