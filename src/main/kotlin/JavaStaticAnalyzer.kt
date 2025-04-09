@@ -53,14 +53,37 @@ class JavaStaticAnalyzer(
     }
 
     fun processJavaFile(file: String) {
-        // Placeholder for processing Java files
-        // collect all classes
-        // check if class is a reference class
-        // check if class is an entry point
+        try {
+            val text = File(file).readText()
+            val packageMatch = packagePattern.find(text)
+            val packageName = packageMatch?.groups?.get(1)?.value ?: ""
+
+            classPattern.findAll(text).forEach { match ->
+                val className = match.groups[3]?.value ?: ""
+                val fullClassName = if (packageName.isNotEmpty()) "$packageName.$className" else className
+                if (excludePatterns.none { it.matches(fullClassName) }) {
+                    allClasses.add(fullClassName)
+                }
+            }
+        } catch (e: Exception) {
+            println("I'm sorry, there seems to be a problem processing your Java file: $file: ${e.message}")
+        }
+
     }
 
     fun findReferences() {
-
+        sourceDirs.map{ File(it)}.forEach { dir ->
+            if (dir.isFile) {
+                dir.walkTopDown()
+                    .filter { it.extension == "java" || it.extension == "class" }
+                    .forEach { file ->
+                        when (file.extension) {
+                            "java" -> findReferencesInJavaFile(file.absolutePath)
+                            "class" -> findReferencesInClassFile(file.absolutePath)
+                        }
+                    }
+            }
+        }
     }
     fun findReferencesInJavaFile(file: String) {
         // Placeholder for finding references in Java files
