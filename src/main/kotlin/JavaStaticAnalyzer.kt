@@ -1,3 +1,4 @@
+import com.sun.org.apache.bcel.internal.classfile.ClassParser
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -46,10 +47,16 @@ class JavaStaticAnalyzer(
     }
 
     fun processClassFile(file: String) {
-        // Placeholder for processing class files
-        // collect all classes
-        // check if class is a reference class
-        // check if class is an entry point
+        try {
+            val classParser = ClassParser(file)
+            val javaClass = classParser.parse()
+            val className = javaClass.className
+            if(excludePatterns.none { it.matches(className) }) {
+                allClasses.add(className)
+            }
+        } catch (e: Exception) {
+            println("I'm sorry, there seems to be a problem processing your class file: $file: ${e.message}")
+        }
     }
 
     fun processJavaFile(file: String) {
