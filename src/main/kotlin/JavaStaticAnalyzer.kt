@@ -105,6 +105,9 @@ class JavaStaticAnalyzer(
         return allClasses.isEmpty()
     }
 
+    fun checkReferenceClasses(): List<String> {
+        return referenceClasses.toList()
+    }
     fun isEntryPoint(className: String): Boolean {
         return entryPoints.any { className.contains(it) }
     }
