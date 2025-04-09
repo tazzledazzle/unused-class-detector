@@ -1,4 +1,7 @@
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.booleans.shouldBeTrue
+import io.kotest.matchers.collections.shouldContain
+import io.kotest.matchers.collections.shouldNotContain
 import java.io.File
 
 class JavaStaticAnalyzerTests: StringSpec({
@@ -36,7 +39,7 @@ class JavaStaticAnalyzerTests: StringSpec({
 
          // Then
          // Check that the classes are collected correctly
-         assert(analyzer.isAllClassesEmpty())
+         assert(!analyzer.isAllClassesEmpty())
    }
 
     "findReferences should detect class references in Java files" {
@@ -55,5 +58,61 @@ class JavaStaticAnalyzerTests: StringSpec({
         // Then
         // Check that the references are detected correctly
         assert(analyzer.checkReferenceClasses().isNotEmpty())
+    }
+
+    "computeUnusedClasses should return classes that are not referenced" {
+        // Given
+        File(sourceDir, "Unused.java").apply {
+            writeText(
+                """
+                    package com.example;
+                    public class Unused {}
+                """.trimIndent()
+            )
+        }
+        File(sourceDir, "Used.java").apply {
+            writeText(
+                """
+                    package com.example;
+                    public class Used {}
+                """.trimIndent()
+            )
+        }
+        File(sourceDir, "Using.java").apply {
+            writeText(
+                """
+                    package com.example;
+                    public class Using {
+                        Used used = new Used();
+                    }
+                """.trimIndent()
+            )
+        }
+        // When
+        analyzer.collectAllClasses()
+        analyzer.findReferences()
+        val unusedClasses = analyzer.computeUnusedClasses()
+
+        // Then
+        // Check that the unused classes are computed correctly
+        assert(unusedClasses.isNotEmpty())
+        unusedClasses.shouldContain ("com.example.Unused")
+        unusedClasses.shouldNotContain ("com.example.Used")
+    }
+
+    "analyze should be thread-safe" {
+        File(sourceDir, "ThreadSafe.java").apply {
+            writeText(
+                """
+                    package com.example;
+                    public class ThreadSafeTest {}
+                """.trimIndent()
+            )
+        }
+        val threads = List(10) { Thread { analyzer.analyze() } }
+        threads.forEach { it.start() }
+        threads.forEach { it.join() }
+
+        analyzer.listAllClasses().contains("com.example.ThreadSafeTest").shouldBeTrue()
     }
 })

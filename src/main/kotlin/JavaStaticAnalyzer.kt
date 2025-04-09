@@ -31,7 +31,7 @@ class JavaStaticAnalyzer(
 
     fun collectAllClasses() {
         sourceDirs.map{ File(it)}.forEach { directory ->
-            if (directory.isFile) {
+            if (directory.isFile || directory.isDirectory) {
                 directory.walkTopDown()
                     .filter { it.extension == "java" || it.extension == "class" }
                     .forEach { file ->
@@ -78,7 +78,7 @@ class JavaStaticAnalyzer(
 
     fun findReferences() {
         sourceDirs.map{ File(it)}.forEach { dir ->
-            if (dir.isFile) {
+            if (dir.isFile || dir.isDirectory) {
                 dir.walkTopDown()
                     .filter { it.extension == "java" || it.extension == "class" }
                     .forEach { file ->
@@ -91,9 +91,20 @@ class JavaStaticAnalyzer(
         }
     }
     fun findReferencesInJavaFile(file: String) {
-        // Placeholder for finding references in Java files
-        // check if class is a reference class
-        // check if class is an entry point
+        try {
+            val text = File(file).readText()
+            importPattern.findAll(text).forEach { match ->
+                val importStatement = match.groups[1]?.value ?: ""
+                if (importStatement.endsWith("*")) {
+                    referenceClasses.add(importStatement)
+                }
+            }
+
+            // extract potential class references
+            TODO("Annotations as well as reflection references")
+        } catch (e: Exception) {
+            println("I'm sorry, there seems to be a problem processing your Java file: $file: ${e.message}")
+        }
     }
 
     fun findReferencesInClassFile(file: String) {
@@ -108,6 +119,10 @@ class JavaStaticAnalyzer(
     fun checkReferenceClasses(): List<String> {
         return referenceClasses.toList()
     }
+    fun listAllClasses(): List<String> {
+        return allClasses.toList()
+    }
+
     fun isEntryPoint(className: String): Boolean {
         return entryPoints.any { className.contains(it) }
     }
