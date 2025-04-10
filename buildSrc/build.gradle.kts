@@ -27,3 +27,17 @@ dependencies {
     testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
 }
 
+gradlePlugin {
+    plugins {
+        create("unusedClassScannerPlugin") {
+            id = "com.tazzledazzle.unused-class-scanner"
+            implementationClass = "UnusedClassScannerPlugin"
+            displayName = "Unused Class Scanner Plugin"
+            description = "A Gradle plugin to scan for unused classes in a project."
+        }
+    }
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
