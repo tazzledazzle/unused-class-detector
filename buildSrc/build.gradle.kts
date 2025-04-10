@@ -16,7 +16,7 @@ repositories {
 
 dependencies {
     implementation(gradleApi())
-    implementation(localGroovy())
+//    implementation(localGroovy())
     implementation(kotlin("stdlib"))
     // ASM
     implementation("org.ow2.asm:asm:9.5")
