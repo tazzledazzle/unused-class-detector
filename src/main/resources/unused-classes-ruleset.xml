@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<ruleset name="Custom Unused Classes Rules"
+         xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.github.io/ruleset_2_0_0.xsd">
+
+    <description>
+        Custom ruleset to detect unused classes in a Java project
+    </description>
+
+    <!-- Include the existing UnusedPrivateField rule from PMD -->
+    <rule ref="category/java/bestpractices.xml/UnusedPrivateField"/>
+
+    <!-- Include the existing UnusedLocalVariable rule from PMD -->
+    <rule ref="category/java/bestpractices.xml/UnusedLocalVariable"/>
+
+    <!-- Include the existing UnusedPrivateMethod rule from PMD -->
+    <rule ref="category/java/bestpractices.xml/UnusedPrivateMethod"/>
+
+    <!-- Include the existing UnusedFormalParameter rule from PMD -->
+    <rule ref="category/java/bestpractices.xml/UnusedFormalParameter"/>
+
+    <!-- Include the existing UnusedImports rule from PMD -->
+    <rule ref="category/java/bestpractices.xml/UnusedImports"/>
+
+    <!-- Add a custom XPath rule to detect unused classes -->
+    <rule name="UnusedClass"
+          language="java"
+          message="This class appears to be unused"
+          class="net.sourceforge.pmd.lang.rule.XPathRule">
+        <description>
+            Detects classes that aren't referenced elsewhere in the project
+        </description>
+        <priority>3</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+                    <![CDATA[
+                //ClassOrInterfaceDeclaration[
+                    @Public='true' and
+                    not(@Interface='true') and
+                    not(../ClassOrInterfaceDeclaration[@AnonymousClass='true']) and
+                    not(@SimpleName='Main' or @SimpleName='App' or @SimpleName='Application') and
+                    not(//PrimaryPrefix[@Image=@SimpleName]) and
+                    not(//ImportDeclaration[contains(@ImportedName, @SimpleName)]) and
+                    not(//ConstructorCall[@ClassOrInterfaceType=@SimpleName])
+                ]
+                ]]>
+                </value>
+            </property>
+        </properties>
+        <example>
+            <![CDATA[
+            // This class isn't used anywhere else in the project
+            public class UnusedClass {
+                // Class contents
+            }
+            ]]>
+        </example>
+    </rule>
+</ruleset>

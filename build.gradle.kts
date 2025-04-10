@@ -1,5 +1,7 @@
 plugins {
     kotlin("jvm") version "2.1.10"
+    java
+    pmd
 }
 
 group = "com.tazzledazzle"
@@ -13,6 +15,8 @@ repositories {
 }
 
 dependencies {
+//    pmd("io.github.abc:pmd-java:7.13.0")
+//    pmd("commons-io:commons-io:2.11.0")
     implementation(kotlin("stdlib"))
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("com.intellij:openapi:7.0.3")
@@ -23,9 +27,32 @@ dependencies {
     testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
 }
 
+pmd {
+//    consoleOutput = true
+    toolVersion = "7.13.0"
+    ruleSets = listOf("src/main/resources/unused-classes-ruleset.xml")
+//    ignoreFailures.set(false)
+}
+
+
+tasks.withType<Pmd> {
+//    toolVersion = "7.13.0-SNAPSHOT"
+    classpath = classpath?.plus(files("src/test/resources/interview-homework-input/src/main/java"))
+    ruleSets = listOf("src/main/resources/unused-classes-ruleset.xml")
+    reports {
+    }
+}
 tasks.test {
     useJUnitPlatform()
 }
 kotlin {
     jvmToolchain(21)
+}
+
+
+tasks.register("setupDependencies") {
+    doLast {
+        val dependencies = configurations.compileClasspath.get().files
+        println("Dependencies: $dependencies")
+    }
 }
