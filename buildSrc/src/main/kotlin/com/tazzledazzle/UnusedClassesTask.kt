@@ -1,3 +1,5 @@
+package com.tazzledazzle
+
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
@@ -6,10 +8,10 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
-class UnusedClassesTask: DefaultTask() {
+class UnusedClassesTask : DefaultTask() {
 
     @get:InputFiles
-    abstract val sourceDirectories: ConfigurableFileCollection
+    abstract var sourceDirectories: ConfigurableFileCollection
 
     @get:OutputFile
     abstract val outputFile: RegularFileProperty

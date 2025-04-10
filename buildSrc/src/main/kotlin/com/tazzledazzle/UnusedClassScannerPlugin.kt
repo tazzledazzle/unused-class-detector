@@ -1,5 +1,5 @@
 // src/main/kotlin/com/example/UnusedClassesPlugin.kt
-package com.example
+package com.tazzledazzle
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -10,7 +10,7 @@ class UnusedClassesPlugin : Plugin<Project> {
         val extension = project.extensions.create("unusedClasses", UnusedClassesExtension::class.java)
 
         project.tasks.register("detectUnusedClasses", UnusedClassesTask::class.java) { task ->
-            task.sourceDirectories.set(project.files(extension.sourceDirectories))
+            task.sourceDirectories = (project.files(extension.sourceDirectories))
             task.outputFile.set(project.layout.buildDirectory.file("reports/unused-classes.txt"))
         }
     }
