@@ -1,3 +1,5 @@
+package com.tazzledazzle
+
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 import org.apache.bcel.classfile.ClassParser

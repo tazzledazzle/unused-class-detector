@@ -1,3 +1,4 @@
+import com.tazzledazzle.JavaStaticAnalyzer
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.collections.shouldContain
