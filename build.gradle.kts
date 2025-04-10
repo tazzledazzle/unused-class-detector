@@ -2,6 +2,7 @@ plugins {
     kotlin("jvm") version "2.1.10"
     java
     pmd
+    id("com.tazzledazzle.unused-class-scanner")
 }
 
 group = "com.tazzledazzle"

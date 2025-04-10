@@ -3,15 +3,19 @@ package com.tazzledazzle
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.util.PatternFilterable
+import org.objectweb.asm.ClassReader
 import java.io.File
+import java.util.concurrent.ConcurrentHashMap
 
-class UnusedClassesTask : DefaultTask() {
+abstract class UnusedClassesTask : DefaultTask() {
 
     @get:InputFiles
-    abstract var sourceDirectories: ConfigurableFileCollection
+    abstract val sourceDirectories: ConfigurableFileCollection
 
     @get:OutputFile
     abstract val outputFile: RegularFileProperty
@@ -52,12 +56,18 @@ class UnusedClassesTask : DefaultTask() {
     fun findUsedClasses(allClasses: Set<String>): Set<String> {
         val usedClasses = ConcurrentHashMap.newKeySet<String>()
 
-        val classFiles = project.files(project.tasks.findByName("compileJava")?.outputs?.files ?: emptyList<File>())
-        classFiles.asFileTree.matching { include("**/*.class") }.forEach { file ->
+        // Collect the project's class files for analysis
+        val classFiles = project.files(
+            project.tasks.findByName("compileJava")?.outputs?.files ?: emptyList<File>()
+        )
+
+        classFiles.asFileTree.filter { it.extension == "class" }.forEach { classFile ->
             try {
-                val reader = ClassReader(file.inputStream())
+                val reader = ClassReader(classFile.inputStream())
                 val visitor = ClassDependencyVisitor(usedClasses)
                 reader.accept(visitor, ClassReader.SKIP_DEBUG or ClassReader.SKIP_FRAMES)
+            } catch (e: Exception) {
+                logger.warn("Error processing class file: $classFile", e)
             }
         }
 
