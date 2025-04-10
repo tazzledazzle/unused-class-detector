@@ -101,16 +101,35 @@ class JavaStaticAnalyzer(
             }
 
             // extract potential class references
-            TODO("Annotations as well as reflection references")
+            referencePattern.findAll(text).forEach { match ->
+                val reference = match.groups[1]?.value ?: ""
+             allClasses.filter { className -> className.endsWith(".$reference")
+                    referenceClasses.add(className)
+                }
+            }
+            annotationPattern.findAll(text).forEach { match ->
+                val annotation = match.groups[1]?.value ?: ""
+                allClasses.filter { className -> className.endsWith(".$annotation")
+                    referenceClasses.add(className)
+                }
+            }
         } catch (e: Exception) {
             println("I'm sorry, there seems to be a problem processing your Java file: $file: ${e.message}")
         }
     }
 
     fun findReferencesInClassFile(file: String) {
-        // Placeholder for finding references in class files
-        // check if class is a reference class
-        // check if class is an entry point
+        try {
+            val classParser = ClassParser(file)
+            val javaClass = classParser.parse()
+
+            val superclassName = javaClass.superClass.className
+            if (superclassName != "java.lang.Object") {
+                referenceClasses.add(superclassName)
+            }
+        } catch (e: Exception) {
+            println("I'm sorry, there seems to be a problem processing your class file: $file: ${e.message}")
+        }
     }
     fun isAllClassesEmpty(): Boolean {
         return allClasses.isEmpty()
